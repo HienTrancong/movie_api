@@ -353,7 +353,7 @@ app.delete('/users/:Username', (req, res) => {
 // });
 
 // Add a movie by ID to a user's list of favorites by mongoose
-app.post('/users/:Username/:MovieId', (req, res) => {
+app.post('/users/:Username/movies/:MovieId', (req, res) => {
   Users.findOneAndUpdate({ Username: req.params.Username }, {
     $addToSet: {
       FavoriteMovies: req.params.MovieId
@@ -388,7 +388,7 @@ app.post('/users/:Username/:MovieId', (req, res) => {
 // });
 
 // Remove a movie by ID to a user's list of favorites by mongoose
-app.delete('/users/:Username/:MovieId', (req, res) => {
+app.delete('/users/:Username/movies/:MovieId', (req, res) => {
   Users.findOneAndUpdate({ Username: req.params.Username }, {
     $pull: {
       FavoriteMovies: req.params.MovieId
