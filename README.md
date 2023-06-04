@@ -47,4 +47,4 @@ It is the server-side component of a “movies” web application. The web appli
 
 ## API details
 
-For details about the API including Business logic, URL, HTTP methods and data format, visit [Documentation.html](https://github.com/HienTrancong/myFlix/blob/main/public/documentation.html)
+For details about the API including Business logic, URL, HTTP methods and data format, visit [Documentation.html](https://github.com/HienTrancong/movie_api/blob/main/public/documentation.html)
