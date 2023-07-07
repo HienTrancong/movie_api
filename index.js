@@ -4,6 +4,7 @@ const express = require('express'),
   morgan = require('morgan'),
   uuid = require('uuid');
 
+
 const app = express();
 
 //parse json to js object
@@ -16,6 +17,27 @@ const Models = require('./models.js');
 
 const Movies = Models.Movie;
 const Users = Models.User;
+
+//Require express-validator for server validation
+const { check, validationResult } = require('express-validator')
+
+//CORs in express
+const cors = require('cors');
+// app.use((cors())); //allow all origins
+
+let allowedOrigins = ['http://localhost:8080', 'http://testsite.com'];
+app.use(cors({
+  origin: (origin, callback) => { //origin property as function
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      let message = 'The CORS policy for this application doesn’t allow access from origin ' + origin;
+      return callback(new Error(message), false) //CORS middleware expect error object as instance of Error class
+    }
+    return callback(null, true);
+  }
+}));
+
+
 
 //require authen logic, app to ensure Express is available in auth.js
 let auth = require('./auth')(app);
@@ -256,31 +278,45 @@ app.get('/users/:userName', passport.authenticate('jwt', { session: false }),
   Email: String,
   Birthday: Date
 }*/
-
-app.post('/users', (req, res) => {
-  Users.findOne({ Username: req.body.Username })
-    .then((user) => {
-      if (user) {
-        return res.status(400).send(req.body.Username + 'already exist');
-      } else {
-        Users.create({
-          Username: req.body.Username,
-          Password: req.body.Password,
-          Email: req.body.Email,
-          Birthday: req.body.Birthday
-        })
-          .then((user) => { res.status(201).json(user) })
-          .catch((error) => {
-            console.error(error);
-            res.status(500).send('Error: ' + error);
+//app.post(path, [middleware], callback)
+app.post('/users',
+  // Validation logic here for request
+  [
+    check('Username', 'Username is required').isLength({ min: 5 }),
+    check('Username', 'Username contains non alphanumeric characters - not allowed.').isAlphanumeric(),
+    check('Password', 'Password is required').not().isEmpty(),
+    check('Email', 'Email does not appear to be valid').isEmail(),
+  ],
+  (req, res) => {
+    //check the validation object for errors
+    let errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+    let hashedPassword = Users.hashPassword(req.body.Password);
+    Users.findOne({ Username: req.body.Username })
+      .then((user) => {
+        if (user) {
+          return res.status(400).send(req.body.Username + 'already exist');
+        } else {
+          Users.create({
+            Username: req.body.Username,
+            Password: hashedPassword,
+            Email: req.body.Email,
+            Birthday: req.body.Birthday
           })
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send('Error: ' + error);
-    })
-});
+            .then((user) => { res.status(201).json(user) })
+            .catch((error) => {
+              console.error(error);
+              res.status(500).send('Error: ' + error);
+            })
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).send('Error: ' + error);
+      })
+  });
 
 
 // PUT user update info
@@ -298,15 +334,30 @@ app.post('/users', (req, res) => {
 
 // Update user info mongoose external data
 app.put('/users/:Username', passport.authenticate('jwt', { session: false }),
+  // Validation logic here for request
+  [
+    check('Username', 'Username is required').isLength({ min: 5 }),
+    check('Username', 'Username contains non alphanumeric characters - not allowed.').isAlphanumeric(),
+    check('Password', 'Password is required').not().isEmpty(),
+    check('Email', 'Email does not appear to be valid').isEmail(),
+  ],
   (req, res) => {
-    Users.findOneAndUpdate({ Username: req.params.Username }, {
-      $set: {
-        Username: req.body.Username,
-        Password: req.body.Password,
-        Email: req.body.Email,
-        Birthday: req.body.Birthday
-      }
-    },
+    //check the validation object for errors
+    let errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+    let hashedPassword = Users.hashPassword(req.body.Password);
+    Users.findOneAndUpdate(
+      { Username: req.params.Username },
+      {
+        $set: {
+          Username: req.body.Username,
+          Password: hashedPassword,
+          Email: req.body.Email,
+          Birthday: req.body.Birthday
+        }
+      },
       { new: true }
     )
       .then((updatedUser) => {
@@ -429,8 +480,8 @@ app.use((err, req, res, next) => {
   res.status(500).send("Oh oh, something went wrong. Please try again later.");
 });
 
-// listen for requests
-app.listen(8080, () => {
-  console.log('Your app is listening on port 8080.');
+// listen for requests using Express
+const port = process.env.PORT || 8080;
+app.listen(port, '0.0.0.0', () => {
+  console.log('Your app is listening on port' + port);
 });
-

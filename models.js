@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt'); // to hash and compare password
 
 let movieSchema = mongoose.Schema({
   Title: { type: String, required: true },
@@ -28,6 +29,17 @@ let userSchema = mongoose.Schema({
     ref: 'Movie'
   }]
 });
+
+//create custom static method mongoose, not using any user instance
+userSchema.statics.hashPassword = (password) => {
+  return bcrypt.hashSync(password, 10);
+}
+
+//create method, using user instance in this.Password
+userSchema.methods.validatePassword = function (password) {
+  return bcrypt.compareSync(password, this.Password); //by regular function this refer to user, not userSchema.methods like arrow function
+}
+
 
 let Movie = mongoose.model('Movie', movieSchema);
 let User = mongoose.model('User', userSchema);
