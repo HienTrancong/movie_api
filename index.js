@@ -45,8 +45,12 @@ let auth = require('./auth')(app);
 const passport = require('passport');
 require('./passport');
 
-//Allow mongoose to connect to the database for CRUD
-mongoose.connect('mongodb://localhost:27017/mfDB', { useNewUrlParser: true, useUnifiedTopology: true });
+//Allow mongoose to connect to the database for CRUD LOCAL
+// mongoose.connect('mongodb://localhost:27017/mfDB', { useNewUrlParser: true, useUnifiedTopology: true });
+
+//Allow mongoose to connect to the database for CRUD SERVER
+mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+
 
 
 
