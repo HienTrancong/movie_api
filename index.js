@@ -52,8 +52,6 @@ require('./passport');
 mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 
-
-
 let users = [
   { _id: "1", Username: "Kevin Guevara", Email: "Kevin.Guevara@gmail.com", Birthday: 1985, FavoriteMovies: [] },
   { _id: "2", Username: "Mercedes Patrick", Email: "Mercedes.Patrick@hotmail.com", Birthday: 1997, FavoriteMovies: [] },
