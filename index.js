@@ -136,7 +136,7 @@ app.get('/documentation', (req, res) => {
 // GET all movies external data by mongoose
 //add authentication
 app.get('/movies',
-  // passport.authenticate('jwt', { session: false }),
+  passport.authenticate('jwt', { session: false }),
   (req, res) => {
     Movies.find()
       .then((movies) => {
