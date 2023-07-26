@@ -12,12 +12,12 @@ let Users = Models.User,
 passport.use(new LocalStrategy(
   //Options to Specify fields in request
   {
-    usernameField: 'Username',
-    passwordField: 'Password'
+    usernameField: 'username',
+    passwordField: 'password'
   }, (username, password, callback) => {
     // Authentication logic
     console.log(username + '  ' + password);
-    Users.findOne({ Username: username })
+    Users.findOne({ username: username })
       .then((user) => {
         if (!user) {
           console.log('Incorrect username');
