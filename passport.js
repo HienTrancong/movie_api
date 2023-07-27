@@ -17,7 +17,7 @@ passport.use(new LocalStrategy(
   }, (username, password, callback) => {
     // Authentication logic
     console.log(username + '  ' + password);
-    Users.findOne({ username: username })
+    Users.findOne({ Username: username })
       .then((user) => {
         if (!user) {
           console.log('Incorrect username');
