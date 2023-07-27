@@ -12,8 +12,8 @@ let Users = Models.User,
 passport.use(new LocalStrategy(
   //Options to Specify fields in request
   {
-    usernameField: 'username',
-    passwordField: 'password'
+    usernameField: 'Username',
+    passwordField: 'Password'
   }, (username, password, callback) => {
     // Authentication logic
     console.log(username + '  ' + password);
