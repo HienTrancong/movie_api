@@ -25,7 +25,7 @@ const { check, validationResult } = require('express-validator')
 const cors = require('cors');
 app.use((cors())); //allow all origins
 
-let allowedOrigins = ['http://localhost:8080', 'http://testsite.com', 'http://localhost:1234', 'https://whimsical-melba-34f942.netlify.app', 'https://myflixtopmovies.netlify.app'];
+let allowedOrigins = ['http://localhost:8080', 'http://testsite.com', 'http://localhost:1234', 'https://whimsical-melba-34f942.netlify.app'];
 app.use(cors({
   origin: (origin, callback) => { //origin property as function
     if (!origin) return callback(null, true);
